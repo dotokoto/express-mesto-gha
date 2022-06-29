@@ -36,7 +36,7 @@ module.exports.createUser = (req, res, next) => {
     ))
     .then((user) => {
       res
-        .status(201)
+        .status(200)
         .send({
           user: {
             email: user.email,
@@ -47,6 +47,7 @@ module.exports.createUser = (req, res, next) => {
         });
     })
     .catch((err) => {
+      console.log(err);
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new CastError('Введены некорректные данные пользователя'));
       }
