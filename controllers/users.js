@@ -69,9 +69,7 @@ module.exports.login = (req, res, next) => {
     .select('+password')
     .then((user) => {
       if (!user) {
-        const err = new Error('Некорректная почта или пароль');
-        err.statusCode = 'ForbiddenError';
-        throw err;
+        throw (new NotFoundError('Некорректная почта или пароль'));
       }
       return Promise.all([
         user,
@@ -80,24 +78,15 @@ module.exports.login = (req, res, next) => {
     })
     .then(([user, isPasswordCorrect]) => {
       if (!isPasswordCorrect) {
-        const err = new Error('Некорректная почта или пароль');
-        err.statusCode = 'ForbiddenError';
-        throw err;
+        throw(new ForbiddenError('Некорректная почта или пароль'));
       }
       return generateToken({ email: user.email });
     })
     .then(() => {
       res
         .status(200);
-      next();
     })
     .catch((err) => {
-      if (err.statusCode === 'CastError') {
-        next(new CastError('Введены некорректные данные пользователя'));
-      }
-      if (err.statusCode === 'ForbiddenError') {
-        next(new ForbiddenError({ message: err.message }));
-      }
       next(err);
     });
 };
