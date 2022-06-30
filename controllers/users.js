@@ -61,6 +61,7 @@ module.exports.createUser = (req, res, next) => {
 /** аутентификация - вход по email и паролю  */
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
+  console.log('in login');
   if (!email || !password) {
     next(new UnauthorizedError('Не передан email или пароль'));
   }
@@ -68,6 +69,7 @@ module.exports.login = (req, res, next) => {
     .findOne({ email })
     .select('+password')
     .then((user) => {
+      console.log('usr: ', user);
       if (!user) {
         throw (new NotFoundError('Некорректная почта или пароль'));
       }
@@ -77,14 +79,16 @@ module.exports.login = (req, res, next) => {
       ]);
     })
     .then(([user, isPasswordCorrect]) => {
+      console.log('is correct: ', isPasswordCorrect);
       if (!isPasswordCorrect) {
         throw(new ForbiddenError('Некорректная почта или пароль'));
       }
       return generateToken({ email: user.email });
     })
-    .then(() => {
-      res
-        .status(200);
+    .then((token) => {
+      console.log('token: ', token);
+      console.log('in res status')
+      res.status(200).send({ token });
     })
     .catch((err) => {
       next(err);
