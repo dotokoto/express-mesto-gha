@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /** роутеры регистрации и аутентификации */
-app.post('/signup', createUser);
+app.post('/signup', validateCreateUser, createUser);
 app.post('/signin', validateLogin, login);
 
 /** роутеры пользователей и карточек, защищены авторизацией */
